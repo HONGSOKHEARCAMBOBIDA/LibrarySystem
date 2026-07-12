@@ -1,0 +1,17 @@
+# Go
+API/.env
+API/bin/
+API/tmp/
+
+# Node
+WEB/node_modules/
+WEB/dist/
+WEB/.env
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
