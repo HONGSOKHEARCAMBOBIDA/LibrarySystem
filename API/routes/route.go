@@ -18,7 +18,7 @@ func SetupRoutes(r *gin.Engine) {
 		public.POST(route.Login, authcontroller.Login)
 		public.POST(route.Refresh, authcontroller.Refresh)
 	}
-	auth := r.Group("/")
+	auth := r.Group("/api/v1")
 	auth.Use(middleware.APIKeyAuth())
 	auth.Use(middleware.AuthMiddleware())
 	{
