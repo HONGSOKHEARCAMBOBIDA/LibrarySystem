@@ -1,0 +1,125 @@
+// ==========================================================================
+// Global styles
+// Tailwind layers + design tokens (CSS variables) + Element Plus theme glue
+// ==========================================================================
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+// --------------------------------------------------------------------------
+// Design tokens — light theme (default)
+// --------------------------------------------------------------------------
+:root {
+  --color-bg: #f5f6fa;
+  --color-surface: #ffffff;
+  --color-surface-hover: #fafafa;
+  --color-border: #e5e7eb;
+  --color-text-primary: #1f2937;
+  --color-text-secondary: #6b7280;
+  --color-text-placeholder: #9ca3af;
+  --color-primary: #6366f1;
+  --color-primary-light: #eef2ff;
+  --sidebar-bg: #171a2e;
+  --sidebar-text: #a3a6c4;
+  --sidebar-text-active: #ffffff;
+  --sidebar-width: 260px;
+  --sidebar-width-collapsed: 72px;
+  --navbar-height: 64px;
+  --radius-card: 6px;
+}
+
+// --------------------------------------------------------------------------
+// Design tokens — dark theme (applied via .dark class on <html>)
+// --------------------------------------------------------------------------
+html.dark {
+  --color-bg: #101322;
+  --color-surface: #171a2e;
+  --color-surface-hover: #1d2138;
+  --color-border: #2a2e45;
+  --color-text-primary: #e5e7eb;
+  --color-text-secondary: #9ca3af;
+  --color-text-placeholder: #6b7280;
+  --color-primary: #818cf8;
+  --color-primary-light: rgba(99, 102, 241, 0.15);
+  --sidebar-bg: #0b0d18;
+  --sidebar-text: #7c80a3;
+  --sidebar-text-active: #ffffff;
+
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+}
+@import url('https://fonts.googleapis.com/css2?family=Siemreap&display=swap');
+body {
+  font-family: 'Siemreap', sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text-primary);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+#app {
+  height: 100%;
+}
+
+// Thin, modern scrollbars
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-placeholder);
+}
+
+// --------------------------------------------------------------------------
+// Shared utility classes used across components
+// --------------------------------------------------------------------------
+.app-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+}
+
+.app-fade-enter-active,
+.app-fade-leave-active {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.app-fade-enter-from,
+.app-fade-leave-to {
+  opacity: 0;
+  transform: translateY(4px);
+}
+
+// --------------------------------------------------------------------------
+// Element Plus theme glue — keep EP components visually consistent with
+// the Tailwind design tokens above without ejecting from EP's own styles.
+// --------------------------------------------------------------------------
+html {
+  --el-color-primary: var(--color-primary);
+  --el-border-radius-base: 8px;
+}
+
+.el-card {
+  --el-card-border-radius: var(--radius-card);
+}
+
+.el-button {
+  font-weight: 500;
+}
