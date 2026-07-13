@@ -53,7 +53,7 @@ const routes = [
       {
         path: 'role',
         name: 'សិទ្ធ',
-        component: () => import('@/views/role/role.vue'),
+        component: () => import('@/views/role/permission.vue'),
         meta: {title: 'សិទ្ធ', icone: 'UserFilled'}
       }
     ],

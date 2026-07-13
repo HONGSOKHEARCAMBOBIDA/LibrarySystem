@@ -11,9 +11,14 @@ import { DEFAULT_PAGE_SIZE } from '@/config/constants'
  *   const { rows, loading, pagination, search, reload } = useTable(fetchUsers)
  */
 export function useTable(fetcher, options = {}) {
+  // Parameter ទី១ fetcherជា Function ដែលទៅយក Data ពី API
+  // Parameter ទី២ options ជា Configuration
   const rows = ref([])
+  // rows ទុក Data ទាំងអស់ដែលបង្ហាញក្នុង Table
   const loading = ref(false)
+  // loading ពេលកំពុង Request API loading = true ពេលចប់ loading = false
   const error = ref(null)
+  // error បើ API Error
   const search = ref('')
 
   const pagination = reactive({
@@ -22,7 +27,10 @@ export function useTable(fetcher, options = {}) {
     total: 0,
   })
 
-  const sort = reactive({ prop: null, order: null }) // order: 'ascending' | 'descending'
+  const sort = reactive({ 
+    prop: null, 
+    order: null }) 
+  
   const filters = reactive({})
 
   async function load() {

@@ -1,7 +1,8 @@
 <script setup>
-// Generic modal wrapper. Use v-model:visible, put form content in the
-// default slot and buttons in the #footer slot (or use the built-in
-// confirm/cancel buttons via showDefaultFooter).
+import { useBreakpoint } from '@/composables/useBreakpoint'
+
+const { isMobile } = useBreakpoint()
+
 defineProps({
   visible: { type: Boolean, required: true },
   title: { type: String, default: '' },
@@ -28,6 +29,7 @@ function confirm() {
 
 <template>
   <el-dialog
+    v-if="!isMobile"
     :model-value="visible"
     :title="title"
     :width="width"
@@ -46,4 +48,58 @@ function confirm() {
       </slot>
     </template>
   </el-dialog>
+
+  <el-drawer
+    v-else
+    :model-value="visible"
+    :title="title"
+    direction="btt"
+    size="auto"
+    class="app-drawer-sheet"
+    destroy-on-close
+    @update:model-value="$emit('update:visible', $event)"
+    @close="close"
+  >
+    <div class="max-h-[70vh] overflow-y-auto">
+      <slot />
+    </div>
+
+    <template v-if="showDefaultFooter" #footer>
+      <slot name="footer">
+        <div class="flex gap-2">
+          <el-button class="flex-1" @click="cancel">{{ cancelText }}</el-button>
+          <el-button
+            class="flex-1"
+            type="primary"
+            :loading="loading"
+            @click="confirm"
+          >
+            {{ confirmText }}
+          </el-button>
+        </div>
+      </slot>
+    </template>
+  </el-drawer>
 </template>
+
+<style scoped>
+:deep(.app-drawer-sheet) {
+  border-radius: 16px 16px 0 0;
+  overflow: hidden;
+}
+
+:deep(.app-drawer-sheet .el-drawer__header) {
+  margin-bottom: 0;
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid var(--el-border-color-lighter);
+}
+
+:deep(.app-drawer-sheet .el-drawer__body) {
+  padding: 16px 20px;
+}
+
+:deep(.app-drawer-sheet .el-drawer__footer) {
+  padding: 12px 20px 20px;
+  border-top: 1px solid var(--el-border-color-lighter);
+}
+</style>

@@ -24,13 +24,13 @@ const searchKeyword = ref("");
 const roleForm = reactive({
   id: null,
   name: "",
-  display_name: "",
+  module_name: "",
 });
 
 // Validation rules
 const roleFormRules = {
   name: [{ required: true, message: "សូមបញ្ចូលឈ្មោះតួនាទី", trigger: "blur" }],
-  display_name: [
+  module_name: [
     { required: true, message: "សូមបញ្ចូលឈ្មោះបង្ហាញ", trigger: "blur" },
   ],
 };
@@ -42,7 +42,7 @@ const filteredRoles = computed(() => {
   return role.value.filter(
     (r) =>
       r.name?.toLowerCase().includes(kw) ||
-      r.display_name?.toLowerCase().includes(kw)
+      r.module_name?.toLowerCase().includes(kw)
   );
 });
 
@@ -50,7 +50,7 @@ async function fetchrole() {
   loading.value = true;
   try {
     const res = await roleService.getrole();
-    role.value = res.data.data || [];
+    role.value = res || [];
   } catch (e) {
     notify.error(e.response?.data?.error || "មានបញ្ហាក្នុងការទាញយកទិន្នន័យ");
   } finally {
@@ -62,7 +62,7 @@ async function fetchrolehaspermission() {
   loading.value = true;
   try {
     const res = await roleService.getrolepermission(selectroleID.value);
-    rolehaspermission.value = res.data.data || [];
+    rolehaspermission.value = res || [];
     total.value = rolehaspermission.value.length;
   } catch (e) {
     notify.error(e.response?.data?.error || "មានបញ្ហាក្នុងការទាញយកទិន្នន័យ");
@@ -84,7 +84,7 @@ function openRoleDialog(row) {
   selectroleID.value = row.id;
   roleForm.id = row.id;
   roleForm.name = row.name;
-  roleForm.display_name = row.display_name;
+  roleForm.module_name = row.module_name;
   roledialogvisible.value = true;
 }
 
@@ -123,7 +123,7 @@ async function updaterole() {
 
   const payload = {
     name: roleForm.name,
-    display_name: roleForm.display_name,
+    module_name: roleForm.module_name,
   };
 
   submitting.value = true;
@@ -164,7 +164,7 @@ onMounted(() => {
       show-index
       :columns="[
         { prop: 'name', label: 'ឈ្មោះ', minWidth: 110 },
-        { prop: 'display_name', label: 'ឈ្មោះបង្ហាញ', minWidth: 120 },
+        { prop: 'module_name', label: 'ឈ្មោះបង្ហាញ', minWidth: 120 },
       ]"
     >
       <template #actions="{ row }">
@@ -206,7 +206,7 @@ onMounted(() => {
         empty-text="មិនមានសិទ្ធិណាមួយទេ"
         :columns="[
           { prop: 'name', label: 'ឈ្មោះ', minWidth: 110 },
-          { prop: 'display_name', label: 'ឈ្មោះបង្ហាញ', minWidth: 120 },
+          { prop: 'module_name', label: 'ឈ្មោះបង្ហាញ', minWidth: 120 },
           { label: 'សិទ្ធិ', slot: 'assigned', minWidth: 80, align: 'center' },
         ]"
       >
@@ -251,8 +251,8 @@ onMounted(() => {
 
           <AppInput
             label="ឈ្មោះបង្ហាញ"
-            prop="display_name"
-            v-model="roleForm.display_name"
+            prop="module_name"
+            v-model="roleForm.module_name"
             placeholder="បញ្ចូលឈ្មោះបង្ហាញ"
             clearable
             @enter="updaterole"

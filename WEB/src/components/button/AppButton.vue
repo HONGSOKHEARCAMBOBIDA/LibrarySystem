@@ -25,7 +25,7 @@ defineProps({
   nativeType: { type: String, default: 'button' },
   block: { type: Boolean, default: false },
   icon: { type: [String, Object], default: null },
-  circle: { type: Boolean, default: false }, 
+  circle: { type: Boolean, default: false },
 })
 defineEmits(['click'])
 </script>

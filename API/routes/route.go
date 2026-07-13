@@ -22,6 +22,10 @@ func SetupRoutes(r *gin.Engine) {
 	auth.Use(middleware.APIKeyAuth())
 	auth.Use(middleware.AuthMiddleware())
 	{
+		// User
+		auth.POST(route.Register, middleware.PermissionMiddleware(permission.UserCreate), authcontroller.Register)
+		auth.GET(route.UserView, middleware.PermissionMiddleware(permission.UserView), authcontroller.GetUser)
+
 		// Role
 		auth.GET(route.RoleView, middleware.PermissionMiddleware(permission.RoleView), rolecontroller.GetRole)
 		auth.PUT(route.RoleUpdate, middleware.PermissionMiddleware(permission.RoleUpdate), rolecontroller.UpdateRole)

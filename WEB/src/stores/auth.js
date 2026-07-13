@@ -5,7 +5,7 @@ export const useAuthStore = defineStore('auth', {
   state: () => ({
     token: null,
     refreshToken: null,
-    user: null, 
+    user: null,
   }),
 
   getters: {
@@ -15,7 +15,7 @@ export const useAuthStore = defineStore('auth', {
     userName: (state) => state.user?.name || 'Guest',
     userAvatar: (state) => state.user?.avatar || '',
   },
-  
+
   actions: {
     async login(credentials) {
       const res = await authService.login(credentials)
@@ -36,10 +36,15 @@ export const useAuthStore = defineStore('auth', {
     },
 
     async refreshAccessToken() {
-      const { token, refreshToken } = await authService.refreshToken(this.refreshToken)
-      this.token = token
-      if (refreshToken) this.refreshToken = refreshToken
-      return token
+      const res = await authService.refreshToken(this.refreshToken) // ✅ pass stored token
+      const user = {
+        name: res.name,
+        email: res.email,
+        roles: res.roles,
+        permissions: res.permissions,
+      }
+      this.setSession({ token: res.token, refreshToken: res.refreshToken, user })
+      return user
     },
 
     setSession({ token, refreshToken, user }) {
@@ -55,7 +60,7 @@ export const useAuthStore = defineStore('auth', {
 
     hasRole(role) {
       if (!role) return true
-      return this.userRoles.includes(role) 
+      return this.userRoles.includes(role)
     },
 
     async logout() {

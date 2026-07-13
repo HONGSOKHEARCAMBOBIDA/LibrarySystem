@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"mysql/config"
+	"mysql/helper"
 	"mysql/model"
 	"mysql/request"
 	"mysql/response"
@@ -23,6 +24,8 @@ import (
 type AuthService interface {
 	Login(ctx context.Context, input request.AuthRequest, c *gin.Context) (*response.AuthResponse, error)
 	RefreshToken(ctx context.Context, input request.RefreshTokenRequest, c *gin.Context) (*response.AuthResponse, error)
+	Register(ctx context.Context, input request.RegisterRequest) error
+	GetUser(ctx context.Context, id int, pf request.Pagination, filter map[string]string) ([]response.UserResponse, *model.PaginationMetadata, error)
 }
 
 type authservice struct {
@@ -89,7 +92,7 @@ func (s *authservice) Login(ctx context.Context, input request.AuthRequest, c *g
 	}
 	utils.Redis.Del(utils.Ctx, key)
 
-	accessExpiry := time.Now().Add(time.Duration(accesstoken) * time.Minute)
+	accessExpiry := time.Now().Add(time.Duration(accesstoken) * time.Hour)
 	claims := jwt.MapClaims{
 		"user_id": user.ID,
 		"email":   user.Email,
@@ -239,4 +242,103 @@ func (s *authservice) RefreshToken(ctx context.Context, input request.RefreshTok
 		Role:         []model.Role{user.Role},
 		Permissions:  permissions,
 	}, nil
+}
+
+func (s *authservice) Register(ctx context.Context, input request.RegisterRequest) error {
+	tx := s.db.WithContext(ctx).Begin()
+	if tx.Error != nil {
+		return tx.Error
+	}
+
+	committed := false
+	defer func() {
+		if r := recover(); r != nil || !committed {
+			tx.Rollback()
+		}
+	}()
+
+	var role model.Role
+	if err := tx.First(&role, input.RoleID).Error; err != nil {
+		return err
+	}
+
+	var lastUser model.User
+	err := tx.Order("id DESC").First(&lastUser).Error
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return err
+	}
+	nextID := lastUser.ID + 1
+
+	email := helper.GenerateEmail(input.NameEN, nextID)
+	passwordHash := utils.HasPassword("12345678")
+
+	newuser := model.User{
+		NameKh:   input.NameKh,
+		NameEN:   input.NameEN,
+		Email:    email,
+		Password: passwordHash,
+		Level:    role.Level,
+		RoleId:   input.RoleID,
+		Gender:   input.Gender,
+		Dob:      input.Dob,
+		Isactive: true,
+	}
+	if err := tx.Create(&newuser).Error; err != nil {
+		return err
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		return err
+	}
+	committed = true
+	return nil
+}
+
+func applyCommonFilter(query *gorm.DB, filter map[string]string) *gorm.DB {
+	for key, value := range filter {
+		if value == "" {
+			continue
+		}
+		switch key {
+		case "name":
+			query = query.Where("u.name_kh LIKE ? OR u.name_en LIKE ?", "%"+value+"%", "%"+value+"%")
+		case "role_id":
+			query = query.Where("u.role_id =?", value)
+		}
+	}
+	return query
+}
+
+func (s *authservice) GetUser(ctx context.Context, id int, pf request.Pagination, filter map[string]string) ([]response.UserResponse, *model.PaginationMetadata, error) {
+	var users []response.UserResponse
+	var user model.User
+	if err := s.db.WithContext(ctx).Preload("Role").First(&user, id).Error; err != nil {
+		return nil, nil, err
+	}
+	offset := (pf.Page - 1) * pf.PageSize
+	userquery := s.db.WithContext(ctx).Table("user u").
+		Select(`
+		u.id AS id,
+		u.name_kh AS name_kh,
+		u.name_en AS name_en,
+		r.id AS role_id,
+		r.module_name AS role_name,
+		u.gender AS gender,
+		u.dob AS dob,
+		u.is_active AS is_active
+	`).
+		Joins("LEFT JOIN role r ON r.id = u.role_id")
+
+	userquery = helper.ApplyAccessGetUser(userquery, s.db, user)
+	userquery = applyCommonFilter(userquery, filter)
+	userquery = userquery.Order("id DESC")
+	var totalCount int64
+	countQuery := userquery.Session(&gorm.Session{})
+	if err := countQuery.Count(&totalCount).Error; err != nil {
+		return nil, nil, err
+	}
+	if err := userquery.Offset(offset).Limit(pf.PageSize).Scan(&users).Error; err != nil {
+		return nil, nil, err
+	}
+	return users, helper.BuildPaginationMeta(pf, totalCount), nil
 }

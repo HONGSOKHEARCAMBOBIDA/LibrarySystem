@@ -4,6 +4,7 @@ export default {
   /**
    * POST /auth/login
    * @param {{email: string, password: string}} credentials
+   * @param {{refresh_token: string}} refreshtoken
    */
   async login(credentials) {
     const { data } = await api.post('/v1/login', credentials)
@@ -25,8 +26,28 @@ export default {
   },
 
   /** POST /auth/refresh */
-  async refreshToken(refreshToken) {
-    const { data } = await api.post('/v1/refresh', { refreshToken })
-    return data
+  async refreshToken(refreshtoken) {
+    const { data } = await api.post('/v1/refresh', { refresh_token: refreshtoken })
+    return data.data
+  },
+
+  /**
+   * POST /v1/register
+   * @param {{name_kh: string, name_en: string, role_id: number, gender: number, dob: string}} payload
+   */
+  async register(payload) {
+    const { data } = await api.post('/v1/register', payload)
+    return data.data
+  },
+
+  /**
+   * GET /v1/user
+   * @param {{page: number, pageSize: number, name?: string, role_id?: number|string}} params
+   * @returns {Promise<{ list: any[], pagination: object }>}
+   */
+  async getUser(params) {
+    const { data } = await api.get('/v1/user.view', { params })
+    // controller returns { success, data, pagination } — flat, not double-wrapped
+    return { list: data.data, pagination: data.pagination }
   },
 }
