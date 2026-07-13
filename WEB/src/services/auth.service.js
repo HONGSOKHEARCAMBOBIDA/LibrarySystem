@@ -47,7 +47,19 @@ export default {
    */
   async getUser(params) {
     const { data } = await api.get('/v1/user.view', { params })
-    // controller returns { success, data, pagination } — flat, not double-wrapped
-    return { list: data.data, pagination: data.pagination }
-  },
+
+    return {
+      list: data.data.map((u) => ({
+        id: u.id,
+        name: u.name_en,
+        nameKh: u.name_kh,
+        role: u.role_name,
+        roleId: u.role_id,
+        gender: u.gender,
+        dob: u.dob,
+        status: u.is_active ? 'active' : 'suspended',
+      })),
+      pagination: data.pagination,
+    }
+  }
 }

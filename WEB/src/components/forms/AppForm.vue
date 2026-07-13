@@ -1,15 +1,4 @@
 <script setup>
-// Generic form wrapper around el-form that standardizes validate -> submit,
-// reset, loading and disabled behavior. Put your fields (AppInput,
-// AppSelect, or raw el-form-item) in the default slot.
-//
-// Usage:
-//   <AppForm ref="formRef" :model="form" :rules="rules" :loading="saving"
-//            @submit="handleSubmit">
-//     <el-form-item label="Name" prop="name">
-//       <el-input v-model="form.name" />
-//     </el-form-item>
-//   </AppForm>
 import { ref } from 'vue'
 
 const props = defineProps({

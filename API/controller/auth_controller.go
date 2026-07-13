@@ -55,6 +55,7 @@ func (cr *AuthController) Refresh(c *gin.Context) {
 func (cr *AuthController) Register(c *gin.Context) {
 	var input request.RegisterRequest
 	if err := c.ShouldBindJSON(&input); err != nil {
+		log.Printf(err.Error())
 		share.ResponseError(c, http.StatusBadRequest, err.Error())
 		return
 	}

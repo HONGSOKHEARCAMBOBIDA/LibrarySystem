@@ -14,7 +14,7 @@ defineEmits(['update:modelValue', 'change'])
 </script>
 
 <template>
-  <div class="app-date-picker">
+  <div class="app-date-picker mb-4">
     <label v-if="label" class="block text-sm font-medium mb-1.5" style="color: var(--color-text-primary)">
       {{ label }}
     </label>

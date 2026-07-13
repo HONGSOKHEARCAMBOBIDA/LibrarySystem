@@ -1,37 +1,29 @@
 <script setup>
-import { reactive, ref, onMounted } from 'vue'
+import { reactive, ref, onMounted,computed } from 'vue'
 import PageHeader from '@/components/common/PageHeader.vue'
 import AppTable from '@/components/tables/AppTable.vue'
 import AppSearch from '@/components/tables/AppSearch.vue'
 import AppPagination from '@/components/tables/AppPagination.vue'
 import AppDialog from '@/components/dialogs/AppDialog.vue'
-import DeleteDialog from '@/components/dialogs/DeleteDialog.vue'
-import UserAvatar from '@/components/common/UserAvatar.vue'
 import { useTable } from '@/composables/useTable'
-import { formatDate } from '@/utils'
 import { notify } from '@/utils/notify'
 import authApi from '@/services/auth.service'
 import roleApi from '@/services/role.service'
 import AppButton from '../../components/button/AppButton.vue'
-
-async function fetchUsers({ page, pageSize, search, sortProp, sortOrder } = {}) {
+import AppForm from '@/components/forms/AppForm.vue'
+import AppInput from '../../components/input/AppInput.vue'
+import AppSelect from '../../components/common/AppSelect.vue'
+import AppDatePicker from '../../components/common/AppDatePicker.vue'
+async function fetchUsers({ page, pageSize, search }) {
   const { list, pagination } = await authApi.getUser({
     page,
     pageSize,
     name: search || undefined,
   })
+
   return {
-    rows: list.map((u) => ({
-      id: u.id,
-      name: u.name_en,
-      nameKh: u.name_kh,
-      role: u.role_name,
-      roleId: u.role_id,
-      gender: u.gender,
-      dob: u.dob,
-      status: u.is_active ? 'active' : 'suspended',
-    })),
-    total: pagination?.totalCount ?? 0,
+    rows: list,
+    total: pagination.totalCount,
   }
 }
 
@@ -56,9 +48,30 @@ onMounted(async () => {
   }
 })
 
+const roleOptions = computed(() =>
+  roles.value.map(role => ({
+    label: role.display_name || role.name,
+    value: role.id,
+  }))
+)
+
+function handleReset() {
+  Object.assign(form, {
+    name_kh: '',
+    name_en: '',
+    role_id: null,
+    gender: 1,
+    dob: '',
+  })
+}
+
+const genderOptions = [
+  { label: 'ប្រុស', value: 1 },
+  { label: 'ស្រី', value: 2 },
+]
+
 const dialogVisible = ref(false)
 const dialogLoading = ref(false)
-const formRef = ref(null)
 const form = reactive({
   name_kh: '',
   name_en: '',
@@ -78,17 +91,16 @@ function openCreate() {
   dialogVisible.value = true
 }
 
-async function handleSave() {
-  try {
-    await formRef.value?.validate()
-  } catch {
-    return
-  }
+async function handleSave(payload) {
   dialogLoading.value = true
+
   try {
-    await authApi.register({ ...form })
+    await authApi.register(payload)
+
     notify.success('User registered successfully.')
+
     dialogVisible.value = false
+
     reload()
   } catch (err) {
     notify.error(err?.response?.data?.message || 'Failed to register user.')
@@ -100,10 +112,7 @@ async function handleSave() {
 
 <template>
   <div>
-    <PageHeader
-      title="អ្នកប្រេីប្រាស់"
-      subtitle="គ្រប់គ្រងសមាជិកក្រុមរបស់អ្នក និងការអនុញ្ញាតគណនីរបស់ពួកគេ"
-    >
+    <PageHeader title="អ្នកប្រេីប្រាស់" subtitle="គ្រប់គ្រងសមាជិកក្រុមរបស់អ្នក និងការអនុញ្ញាតគណនីរបស់ពួកគេ">
       <template #actions>
         <AppButton type="primary" @click="openCreate">
           បង្កេីតថ្មី
@@ -118,13 +127,7 @@ async function handleSave() {
       </span>
     </div>
 
-    <AppTable
-      :columns="columns"
-      :data="rows"
-      :loading="loading"
-      row-key="id"
-      empty-text="No users match your search"
-    >
+    <AppTable :columns="columns" :data="rows" :loading="loading" row-key="id" empty-text="No users match your search">
       <template #name="{ row }">
         <div class="flex flex-col gap-1">
           <span class="font-medium text-gray-900 leading-none">
@@ -147,54 +150,26 @@ async function handleSave() {
       </template>
     </AppTable>
 
-    <AppPagination
-      :page="pagination.page"
-      :page-size="pagination.pageSize"
-      :total="pagination.total"
-      @update:page="handlePageChange"
-      @update:page-size="handlePageSizeChange"
-    />
+    <AppPagination :page="pagination.page" :page-size="pagination.pageSize" :total="pagination.total"
+      @update:page="handlePageChange" @update:page-size="handlePageSizeChange" />
 
-    <AppDialog
-      v-model:visible="dialogVisible"
-      title="បង្កេីតអ្នកប្រេីប្រាស់"
-      :loading="dialogLoading"
-      confirm-text="Register"
-      @confirm="handleSave"
-    >
-      <el-form ref="formRef" :model="form" :rules="rules" label-position="top">
-        <el-form-item label="Name (English)" prop="name_en">
-          <el-input v-model="form.name_en" placeholder="e.g. Jane Doe" />
-        </el-form-item>
-        <el-form-item label="Name (Khmer)" prop="name_kh">
-          <el-input v-model="form.name_kh" placeholder="ឈ្មោះ" />
-        </el-form-item>
-        <el-form-item label="Role" prop="role_id">
-          <el-select v-model="form.role_id" class="w-full">
-            <el-option
-              v-for="r in roles"
-              :key="r.id"
-              :label="r.display_name || r.name"
-              :value="r.id"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="Gender" prop="gender">
-          <el-select v-model="form.gender" class="w-full">
-            <el-option label="Male" :value="1" />
-            <el-option label="Female" :value="2" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="Date of Birth" prop="dob">
-          <el-date-picker
-            v-model="form.dob"
-            type="date"
-            value-format="YYYY-MM-DD"
-            class="w-full"
-            placeholder="Select date"
-          />
-        </el-form-item>
-      </el-form>
+    <AppDialog v-model:visible="dialogVisible" title="បង្កេីតអ្នកប្រេីប្រាស់" :showDefaultFooter="false">
+      <AppForm :model="form" :rules="rules" :loading="dialogLoading" :show-actions="true" @submit="handleSave" @reset="handleReset"
+      submitText="កែប្រែ" resetText="ថយក្រោយ"
+      >
+        <AppInput v-model="form.name_en" prop="name_en" label="ឈ្មោះអង់គ្លេស" clearable></AppInput>
+        <AppInput v-model="form.name_kh" prop="name_kh" label="ឈ្មោះខ្មែរ" clearable></AppInput>
+
+        <AppSelect label="ជ្រេីសតួនាទី" prop="role_id" v-model="form.role_id" :options="roleOptions" placeholder="ជ្រេីសរេីសតួនាទី"
+          clearable />
+
+
+        <AppSelect label="ជ្រេីសភេទ" v-model="form.gender" :options="genderOptions" placeholder="ជ្រេីសរេីសភេទ"
+          clearable />
+        <AppDatePicker v-model="form.dob" label="ថ្ងៃ-ខែ-ឆ្នាំកំណេីត" clearable>
+
+        </AppDatePicker>
+      </AppForm>
     </AppDialog>
   </div>
 </template>
