@@ -6,6 +6,7 @@ import (
 	"mysql/helper"
 	"mysql/request"
 	"mysql/service"
+	"mysql/utils"
 	"net/http"
 	"strconv"
 
@@ -102,4 +103,21 @@ func (cr *AuthController) GetUser(c *gin.Context) {
 		"data":       users,
 		"pagination": metadata,
 	})
+}
+
+func (cr *AuthController) Update(c *gin.Context) {
+	id, ok := utils.GetParamID(c)
+	if !ok {
+		return
+	}
+	var input request.UpdateUserRequest
+	if err := c.ShouldBindJSON(&input); err != nil {
+		share.ResponseError(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	if err := cr.service.Update(c, id, input); err != nil {
+		share.ResponseError(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	share.ResponseSuccess(c, http.StatusOK, share.Updated)
 }

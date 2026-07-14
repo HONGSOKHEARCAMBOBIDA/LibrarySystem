@@ -12,4 +12,9 @@ const (
 	RolePermissionView   = "role.permission.view"
 	RolePermissionCreate = "role.permission.create"
 	RolePermissionDelete = "role.permission.delete"
+
+	AuthorView   = "author.view"
+	AuthorCreate = "author.create"
+	AuthorUpdate = "author.update"
+	AuthorDelete = "author.delete"
 )

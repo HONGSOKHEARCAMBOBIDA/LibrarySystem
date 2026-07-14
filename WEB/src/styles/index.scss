@@ -67,6 +67,20 @@ body {
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
+.el-button,
+.el-input,
+.el-select,
+.el-dialog,
+.el-table,
+.el-menu,
+.el-form,
+.el-card,
+.el-dropdown,
+.el-date-picker,
+.el-input__inner::placeholder {
+  font-family: 'Siemreap', sans-serif;
+}
+
 #app {
   height: 100%;
 }

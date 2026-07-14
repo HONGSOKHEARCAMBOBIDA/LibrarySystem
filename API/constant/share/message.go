@@ -13,3 +13,8 @@ func ResponseSuccess(c *gin.Context, code int, message string) {
 func RespondDate(c *gin.Context, code int, data interface{}) {
 	c.JSON(code, gin.H{"data": data})
 }
+
+const (
+	Updated = "Updated"
+	Created = "Created"
+)

@@ -1,8 +1,8 @@
 <script setup>
-// Reusable date picker wrapping el-date-picker (single date or range).
 defineProps({
   modelValue: { type: [String, Date, Array], default: null },
   label: { type: String, default: '' },
+  prop: { type: String, default: '' },
   type: { type: String, default: 'date' }, // date | daterange | datetime | month
   placeholder: { type: String, default: 'Select date' },
   format: { type: String, default: 'YYYY-MM-DD' },
@@ -14,10 +14,7 @@ defineEmits(['update:modelValue', 'change'])
 </script>
 
 <template>
-  <div class="app-date-picker mb-4">
-    <label v-if="label" class="block text-sm font-medium mb-1.5" style="color: var(--color-text-primary)">
-      {{ label }}
-    </label>
+  <el-form-item :prop="prop" :label="label" class="app-date-picker mb-4">
     <el-date-picker
       :model-value="modelValue"
       :type="type"
@@ -32,5 +29,5 @@ defineEmits(['update:modelValue', 'change'])
       @update:model-value="$emit('update:modelValue', $event)"
       @change="$emit('change', $event)"
     />
-  </div>
+  </el-form-item>
 </template>

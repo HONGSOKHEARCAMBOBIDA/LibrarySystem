@@ -12,6 +12,7 @@ import (
 func SetupRoutes(r *gin.Engine) {
 	authcontroller := controller.NewAuthController()
 	rolecontroller := controller.NewRoleHasPermissionController()
+	authorcontroller := controller.NewAuthorController()
 	public := r.Group("/api/v1")
 	public.Use(middleware.APIKeyAuth())
 	{
@@ -25,6 +26,7 @@ func SetupRoutes(r *gin.Engine) {
 		// User
 		auth.POST(route.Register, middleware.PermissionMiddleware(permission.UserCreate), authcontroller.Register)
 		auth.GET(route.UserView, middleware.PermissionMiddleware(permission.UserView), authcontroller.GetUser)
+		auth.PUT(route.UserUpdate, middleware.PermissionMiddleware(permission.UserUpdate), authcontroller.Update)
 
 		// Role
 		auth.GET(route.RoleView, middleware.PermissionMiddleware(permission.RoleView), rolecontroller.GetRole)
@@ -33,5 +35,7 @@ func SetupRoutes(r *gin.Engine) {
 		auth.POST(route.RolePermissionCreate, middleware.PermissionMiddleware(permission.RolePermissionCreate), rolecontroller.CreateRoleHasPermission)
 		auth.DELETE(route.RolePermissionDelete, middleware.PermissionMiddleware(permission.RolePermissionDelete), rolecontroller.DeleteRoleHasPermission)
 
+		// Author
+		auth.POST(route.AuthorCreate, middleware.PermissionMiddleware(permission.AuthorCreate), authorcontroller.CreateAuthor)
 	}
 }

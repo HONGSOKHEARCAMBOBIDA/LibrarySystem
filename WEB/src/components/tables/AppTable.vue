@@ -14,18 +14,14 @@ defineProps({
   stripe: { type: Boolean, default: true },
 })
 
-defineEmits([
-  'sort-change',
-  'selection-change',
-  'row-click',
-])
+defineEmits(['sort-change', 'selection-change', 'row-click'])
 </script>
 
 <template>
   <div class="app-table app-card overflow-hidden">
-
     <!-- Desktop -->
     <el-table
+      border
       v-if="!isMobile"
       v-loading="loading"
       :data="data"
@@ -36,11 +32,7 @@ defineEmits([
       @selection-change="$emit('selection-change', $event)"
       @row-click="$emit('row-click', $event)"
     >
-      <el-table-column
-        v-if="showSelection"
-        type="selection"
-        width="46"
-      />
+      <el-table-column v-if="showSelection" type="selection" width="46" />
 
       <el-table-column
         v-for="col in columns"
@@ -49,33 +41,17 @@ defineEmits([
         :label="col.label"
         :width="col.width"
         :min-width="col.minWidth"
-        :sortable="col.sortable ? 'custom' : false"
         :fixed="col.fixed"
         :align="col.align || 'left'"
-        show-overflow-tooltip
       >
-        <template
-          v-if="col.slot"
-          #default="scope"
-        >
-          <slot
-            :name="col.slot"
-            v-bind="scope"
-          />
+        <template v-if="col.slot" #default="scope">
+          <slot :name="col.slot" v-bind="scope" />
         </template>
       </el-table-column>
 
-      <el-table-column
-        v-if="$slots.actions"
-        label="សកម្មភាព"
-        width="180"
-        align="right"
-      >
+      <el-table-column v-if="$slots.actions" label="សកម្មភាព" width="180" align="center">
         <template #default="scope">
-          <slot
-            name="actions"
-            v-bind="scope"
-          />
+          <slot name="actions" v-bind="scope" />
         </template>
       </el-table-column>
 
@@ -85,71 +61,54 @@ defineEmits([
     </el-table>
 
     <!-- Mobile -->
-  <!-- Mobile -->
-<div
-  v-else
-  v-loading="loading"
-  class="flex flex-col gap-3"
->
-  <EmptyState
-    v-if="!loading && !data.length"
-    :description="emptyText"
-  />
+    <!-- Mobile -->
+    <div v-else v-loading="loading" class="flex flex-col gap-3">
+      <EmptyState v-if="!loading && !data.length" :description="emptyText" />
 
-  <div
-    v-for="(row, index) in data"
-    :key="row[rowKey] || index"
-    class="rounded-xl border border-[var(--el-border-color-lighter)] bg-[var(--el-bg-color)] px-4 py-4 shadow-sm transition-shadow"
-    :class="{ 'cursor-pointer hover:shadow-md active:shadow-none': $attrs.onRowClick || true }"
-    @click="$emit('row-click', row)"
-  >
-    <div class="flex items-start justify-between gap-3">
-      <el-checkbox
-        v-if="showSelection"
-        class="mt-0.5"
-        @click.stop
-        @change="$emit('selection-change', $event ? [row] : [])"
-      />
+      <div
+        v-for="(row, index) in data"
+        :key="row[rowKey] || index"
+        class="rounded-xl border border-[var(--el-border-color-lighter)] bg-[var(--el-bg-color)] px-4 py-4 shadow-sm transition-shadow"
+        :class="{ 'cursor-pointer hover:shadow-md active:shadow-none': $attrs.onRowClick || true }"
+        @click="$emit('row-click', row)"
+      >
+        <div class="flex items-start justify-between gap-3">
+          <el-checkbox
+            v-if="showSelection"
+            class="mt-0.5"
+            @click.stop
+            @change="$emit('selection-change', $event ? [row] : [])"
+          />
 
-      <div class="flex-1 divide-y divide-[var(--el-border-color-lighter)]">
-        <div
-          v-for="col in columns"
-          :key="col.prop || col.label"
-          class="flex items-center justify-between gap-4 py-2 first:pt-0 last:pb-0"
-        >
-          <span class="shrink-0 text-sm font-medium text-[var(--el-text-color-secondary)]">
-            {{ col.label }}
-          </span>
+          <div class="flex-1 divide-y divide-[var(--el-border-color-lighter)]">
+            <div
+              v-for="col in columns"
+              :key="col.prop || col.label"
+              class="flex items-center justify-between gap-4 py-2 first:pt-0 last:pb-0"
+            >
+              <span class="shrink-0 text-sm font-medium text-[var(--el-text-color-secondary)]">
+                {{ col.label }}
+              </span>
 
-          <div class="break-words text-right text-sm text-[var(--el-text-color-primary)]">
-            <slot
-              v-if="col.slot"
-              :name="col.slot"
-              :row="row"
-              :$index="index"
-            />
-            <template v-else>
-              {{ row[col.prop] }}
-            </template>
+              <div class="break-words text-right text-sm text-[var(--el-text-color-primary)]">
+                <slot v-if="col.slot" :name="col.slot" :row="row" :$index="index" />
+                <template v-else>
+                  {{ row[col.prop] }}
+                </template>
+              </div>
+            </div>
           </div>
+        </div>
+
+        <div
+          v-if="$slots.actions"
+          class="mt-3 flex justify-end gap-2 border-t border-[var(--el-border-color-lighter)] pt-3"
+          @click.stop
+        >
+          <slot name="actions" :row="row" :$index="index" />
         </div>
       </div>
     </div>
-
-    <div
-      v-if="$slots.actions"
-      class="mt-3 flex justify-end gap-2 border-t border-[var(--el-border-color-lighter)] pt-3"
-      @click.stop
-    >
-      <slot
-        name="actions"
-        :row="row"
-        :$index="index"
-      />
-    </div>
-  </div>
-</div>
-
   </div>
 </template>
 

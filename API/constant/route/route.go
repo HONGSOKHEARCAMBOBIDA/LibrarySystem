@@ -11,7 +11,7 @@ const (
 	// User
 	UserView   = "user.view"
 	UserCreate = "user.create"
-	UserUpdate = "user.update"
+	UserUpdate = "user.update/:id"
 	UserDelete = "user.delete"
 
 	RoleView             = "role.view"
@@ -20,4 +20,10 @@ const (
 	RolePermissionView   = "role.permission.view/:id"
 	RolePermissionCreate = "role.permission.create"
 	RolePermissionDelete = "role.permission.delete"
+
+	// Author
+	AuthorView   = "author.view"
+	AuthorCreate = "author.create"
+	AuthorUpdate = "author.update/:id"
+	AuthorDelete = "author.delete/:id"
 )

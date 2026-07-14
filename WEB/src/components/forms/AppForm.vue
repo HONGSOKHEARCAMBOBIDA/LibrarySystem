@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from 'vue'
+import AppButton from '../button/AppButton.vue'
 
 const props = defineProps({
   model: { type: Object, required: true },
@@ -47,10 +48,8 @@ defineExpose({ validate: () => formRef.value?.validate(), resetFields: handleRes
     <slot />
 
     <div v-if="showActions" class="flex items-center gap-2 mt-2">
-      <el-button type="primary" :loading="loading" @click="handleSubmit">
-        {{ submitText }}
-      </el-button>
-      <el-button :disabled="loading" @click="handleReset">{{ resetText }}</el-button>
+      <app-button plain type="primary" :loading="loading" @click="handleSubmit" size="default">{{ submitText }}</app-button>
+       <app-button plain type="warning" :disabled="loading" @click="handleReset" size="default">{{ resetText }}</app-button>
     </div>
   </el-form>
 </template>

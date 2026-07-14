@@ -25,6 +25,7 @@ type UserResponse struct {
 	base.ModelBase
 	NameKh   string `json:"name_kh" gorm:"column:name_kh"`
 	NameEN   string `json:"name_en" gorm:"column:name_en"`
+	Email    string `json:"email" gorm:"column:email"`
 	RoleId   int    `json:"role_id"`
 	RoleName string `json:"role_name"`
 	Gender   int    `json:"gender" gorm:"column:gender"`

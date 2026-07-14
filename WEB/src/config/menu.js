@@ -17,15 +17,11 @@ export const menuConfig = [
     path: '/dashboard',
   },
   {
-    title: 'Users',
-    icon: 'User',
-    path: '/users',
-  },
-  {
     title: 'Settings',
     icon: 'Setting',
     children: [
       { title: 'General', icon: 'Tools', path: '/settings' },
+      {title: 'អ្នកប្រេីប្រាស់', icon: 'User',path: '/users'},
       {title: 'សិទ្ធ',icon: 'UserFilled',path: '/role'}
     ],
   },

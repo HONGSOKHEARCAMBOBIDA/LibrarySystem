@@ -72,4 +72,32 @@ var Permissions = []model.Permission{
 		DisplayName: "Delete Role Has Permission",
 		OrderNo:     6,
 	},
+
+	{
+		Name:        "author.create",
+		ModuleName:  "author",
+		DisplayName: "Create Author",
+		OrderNo:     1,
+	},
+
+	{
+		Name:        "author.view",
+		ModuleName:  "author",
+		DisplayName: "View Author",
+		OrderNo:     2,
+	},
+
+	{
+		Name:        "author.update",
+		ModuleName:  "author",
+		DisplayName: "Update Author",
+		OrderNo:     3,
+	},
+
+	{
+		Name:        "author.delete",
+		ModuleName:  "author",
+		DisplayName: "Delete Author",
+		OrderNo:     4,
+	},
 }

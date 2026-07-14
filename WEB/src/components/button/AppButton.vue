@@ -32,8 +32,7 @@ defineEmits(['click'])
 
 <style scoped>
 .app-button {
-  height: 44px;
-  font-size: 15px;
+  font-size: 12px;
   font-weight: 600;
 }
 .app-button--block {

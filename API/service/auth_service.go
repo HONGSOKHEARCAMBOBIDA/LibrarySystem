@@ -25,6 +25,7 @@ type AuthService interface {
 	Login(ctx context.Context, input request.AuthRequest, c *gin.Context) (*response.AuthResponse, error)
 	RefreshToken(ctx context.Context, input request.RefreshTokenRequest, c *gin.Context) (*response.AuthResponse, error)
 	Register(ctx context.Context, input request.RegisterRequest) error
+	Update(ctx context.Context, id int, input request.UpdateUserRequest) error
 	GetUser(ctx context.Context, id int, pf request.Pagination, filter map[string]string) ([]response.UserResponse, *model.PaginationMetadata, error)
 }
 
@@ -321,6 +322,7 @@ func (s *authservice) GetUser(ctx context.Context, id int, pf request.Pagination
 		u.id AS id,
 		u.name_kh AS name_kh,
 		u.name_en AS name_en,
+		u.email AS email,
 		r.id AS role_id,
 		r.module_name AS role_name,
 		u.gender AS gender,
@@ -340,5 +342,63 @@ func (s *authservice) GetUser(ctx context.Context, id int, pf request.Pagination
 	if err := userquery.Offset(offset).Limit(pf.PageSize).Scan(&users).Error; err != nil {
 		return nil, nil, err
 	}
+	for i := range users {
+		users[i].Dob = helper.FormatDate(users[i].Dob)
+	}
 	return users, helper.BuildPaginationMeta(pf, totalCount), nil
+}
+
+func (s *authservice) Update(ctx context.Context, id int, input request.UpdateUserRequest) error {
+	return s.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		var user model.User
+		if err := tx.First(&user, id).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				return errors.New("user not found")
+			}
+			return err
+		}
+
+		updates := make(map[string]interface{})
+
+		if input.NameKh != nil {
+			updates["name_kh"] = *input.NameKh
+		}
+
+		if input.NameEN != nil {
+			updates["name_en"] = *input.NameEN
+		}
+
+		if input.Gender != nil {
+			updates["gender"] = *input.Gender
+		}
+
+		if input.Dob != nil {
+			updates["dob"] = *input.Dob
+		}
+
+		if input.RoleID != nil {
+			var role model.Role
+			if err := tx.First(&role, *input.RoleID).Error; err != nil {
+				if errors.Is(err, gorm.ErrRecordNotFound) {
+					return errors.New("role not found")
+				}
+				return err
+			}
+			updates["role_id"] = *input.RoleID
+		}
+
+		if len(updates) == 0 {
+			return errors.New("no data to update")
+		}
+		result := tx.Model(&user).Updates(updates)
+		if result.Error != nil {
+			return result.Error
+		}
+
+		if result.RowsAffected == 0 {
+			return errors.New("user was not updated")
+		}
+
+		return nil
+	})
 }
