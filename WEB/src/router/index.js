@@ -55,6 +55,12 @@ const routes = [
         name: 'សិទ្ធ',
         component: () => import('@/views/role/permission.vue'),
         meta: {title: 'សិទ្ធ', icone: 'UserFilled'}
+      },
+      {
+        path: 'author',
+        name: 'អ្នកនិពន្ធ',
+        component: () => import('@/views/author/author.vue'),
+        meta: {title: 'អ្នកនិពន្ធ', icone: 'UserFilled'}
       }
     ],
   },

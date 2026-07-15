@@ -1,9 +1,7 @@
 package model
 
-import "mysql/model/base"
-
 type Faculty struct {
-	base.ModelBase
+	ID       int    `json:"id"`
 	Name     string `json:"name" gorm:"column:name"`
 	Code     string `json:"code" gorm:"column:code;uniqueIndex"`
 	Isactive bool   `json:"is_active" gorm:"column:is_active"`

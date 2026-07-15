@@ -5,6 +5,7 @@ import (
 	"mysql/request"
 	"mysql/service"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -30,4 +31,36 @@ func (cr *AuthorController) CreateAuthor(c *gin.Context) {
 		return
 	}
 	share.ResponseSuccess(c, http.StatusOK, share.Created)
+}
+
+func (cr *AuthorController) GetAuthor(c *gin.Context) {
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "10"))
+	if page < 1 {
+		page = 1
+	}
+	if pageSize < 1 || pageSize > 100 {
+		pageSize = 10
+	}
+
+	filter := map[string]string{
+		"name":      c.Query("name"),
+		"gender":    c.Query("gender"),
+		"is_active": c.Query("is_active"),
+	}
+
+	authors, metadata, err := cr.service.GetAuthor(c, request.Pagination{
+		Page:     page,
+		PageSize: pageSize,
+	}, filter)
+
+	if err != nil {
+		share.ResponseError(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"success":    true,
+		"data":       authors,
+		"pagination": metadata,
+	})
 }

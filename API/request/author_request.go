@@ -5,5 +5,5 @@ type AuthorRequestCreate struct {
 	Gender     int    `json:"gender" binding:"oneof=0 1 2"`
 	IsActive   bool   `json:"is_active"`
 	Note       string `json:"note"`
-	FacultyIDs []int  `json:"faculty_ids"`
+	FacultyIDs []*int `json:"faculty_ids"`
 }
