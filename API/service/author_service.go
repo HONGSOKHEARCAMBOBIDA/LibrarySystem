@@ -2,18 +2,22 @@ package service
 
 import (
 	"context"
-	"errors"
+	"fmt"
 	"mysql/config"
 	"mysql/model"
 	"mysql/request"
 	"mysql/response"
+	"mysql/utils"
 
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type AuthorService interface {
 	CreateAuthor(ctx context.Context, input request.AuthorRequestCreate) error
+	UpdateAuthor(ctx context.Context, id int, input request.AuthorRequestUpdate) error
 	GetAuthor(ctx context.Context, pf request.Pagination, filter map[string]string) ([]response.AuthorResponse, *model.PaginationMetadata, error)
+	ToggleStatusAuthor(ctx context.Context, id int) error
 }
 
 type authorservice struct {
@@ -27,9 +31,6 @@ func NewAuthorService() AuthorService {
 }
 
 func (s *authorservice) CreateAuthor(ctx context.Context, input request.AuthorRequestCreate) error {
-	if len(input.FacultyIDs) == 0 {
-		return errors.New("faculty cannot be empty")
-	}
 	tx := s.db.WithContext(ctx).Begin()
 	if tx.Error != nil {
 		return tx.Error
@@ -156,4 +157,73 @@ func (s *authorservice) GetAuthor(ctx context.Context, pf request.Pagination, fi
 	}
 
 	return authors, metadata, nil
+}
+
+func (s *authorservice) UpdateAuthor(ctx context.Context, id int, input request.AuthorRequestUpdate) error {
+	tx := s.db.WithContext(ctx).Begin()
+	if tx.Error != nil {
+		return fmt.Errorf("failed to start transaction: %w", tx.Error)
+	}
+
+	committed := false
+	defer func() {
+		if r := recover(); r != nil || !committed {
+			tx.Rollback()
+		}
+	}()
+
+	var author model.Author
+	if err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).First(&author, id).Error; err != nil {
+		return err
+	}
+
+	updates := map[string]interface{}{}
+	if input.Name != nil {
+		updates["name"] = *input.Name
+	}
+	if input.Gender != nil {
+		updates["gender"] = *input.Gender
+	}
+	if input.Note != nil {
+		updates["note"] = *input.Note
+	}
+
+	if len(updates) > 0 {
+		if err := tx.Model(&model.Author{}).Where("id = ?", id).Updates(updates).Error; err != nil {
+			return fmt.Errorf("failed to update author: %w", err)
+		}
+	}
+
+	if len(input.FacultyIDs) != 0 {
+		if err := tx.Where("author_id = ?", author.ID).Delete(&model.AuthorFaculty{}).Error; err != nil {
+			return fmt.Errorf("failed to clear old faculties: %w", err)
+		}
+
+		authorfaculties := make([]model.AuthorFaculty, 0, len(input.FacultyIDs))
+		for _, fid := range input.FacultyIDs {
+			if fid == nil {
+				continue
+			}
+			authorfaculties = append(authorfaculties, model.AuthorFaculty{
+				AuthorID:  author.ID,
+				FacultyID: *fid,
+			})
+		}
+
+		if len(authorfaculties) > 0 {
+			if err := tx.Create(&authorfaculties).Error; err != nil {
+				return fmt.Errorf("failed to create author faculties: %w", err)
+			}
+		}
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		return fmt.Errorf("failed to commit transaction: %w", err)
+	}
+	committed = true
+	return nil
+}
+
+func (s *authorservice) ToggleStatusAuthor(ctx context.Context, id int) error {
+	return utils.ToggleStatus[model.Author](ctx, s.db, id)
 }

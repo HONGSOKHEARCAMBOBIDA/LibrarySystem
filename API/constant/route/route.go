@@ -22,10 +22,11 @@ const (
 	RolePermissionDelete = "role.permission.delete"
 
 	// Author
-	AuthorView   = "author.view"
-	AuthorCreate = "author.create"
-	AuthorUpdate = "author.update/:id"
-	AuthorDelete = "author.delete/:id"
+	AuthorView         = "author.view"
+	AuthorCreate       = "author.create"
+	AuthorUpdate       = "author.update/:id"
+	AuthorToggleStatus = "author.toggle.status/:id"
+	AuthorDelete       = "author.delete/:id"
 
 	// Faculty-Department-Program
 	FacultyView    = "faculty.view"

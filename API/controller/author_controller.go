@@ -4,6 +4,7 @@ import (
 	"mysql/constant/share"
 	"mysql/request"
 	"mysql/service"
+	"mysql/utils"
 	"net/http"
 	"strconv"
 
@@ -63,4 +64,33 @@ func (cr *AuthorController) GetAuthor(c *gin.Context) {
 		"data":       authors,
 		"pagination": metadata,
 	})
+}
+
+func (cr *AuthorController) UpdateAuthor(c *gin.Context) {
+	id, ok := utils.GetParamID(c)
+	if !ok {
+		return
+	}
+	var input request.AuthorRequestUpdate
+	if err := c.ShouldBindJSON(&input); err != nil {
+		share.ResponseError(c, http.StatusOK, err.Error())
+		return
+	}
+	if err := cr.service.UpdateAuthor(c, id, input); err != nil {
+		share.ResponseError(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	share.ResponseSuccess(c, http.StatusOK, share.Updated)
+}
+
+func (cr *AuthorController) ToggleStatusAuthor(c *gin.Context) {
+	id, ok := utils.GetParamID(c)
+	if !ok {
+		share.ResponseError(c, http.StatusBadRequest, "Invalid ID")
+		return
+	}
+	if err := cr.service.ToggleStatusAuthor(c, id); err != nil {
+		share.ResponseError(c, http.StatusInternalServerError, err.Error())
+		return
+	}
 }

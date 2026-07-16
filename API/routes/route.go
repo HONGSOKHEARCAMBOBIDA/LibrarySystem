@@ -39,6 +39,8 @@ func SetupRoutes(r *gin.Engine) {
 		// Author
 		auth.POST(route.AuthorCreate, middleware.PermissionMiddleware(permission.AuthorCreate), authorcontroller.CreateAuthor)
 		auth.GET(route.AuthorView, middleware.PermissionMiddleware(permission.AuthorView), authorcontroller.GetAuthor)
+		auth.PUT(route.AuthorUpdate, middleware.PermissionMiddleware(permission.AuthorUpdate), authorcontroller.UpdateAuthor)
+		auth.PUT(route.AuthorToggleStatus, middleware.PermissionMiddleware(permission.AuthorUpdate), authorcontroller.ToggleStatusAuthor)
 
 		// Faculty
 		auth.GET(route.FacultyView, middleware.PermissionMiddleware(permission.FacultyView), facultycontroller.GetFaculty)

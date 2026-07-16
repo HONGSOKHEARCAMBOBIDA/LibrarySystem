@@ -1,6 +1,6 @@
 <script setup>
 import { ref, reactive, computed, watch, onMounted } from 'vue'
-import { getauthor, createauthor, updateauthor } from '../../services/author.service'
+import { getauthor, createauthor, updateauthor,togglestatusauthor } from '../../services/author.service'
 import { getfaculty } from '../../services/faculty.service.js'
 import { useNotification } from '../../composables/useNotification'
 import TableCustom from '../../components/tables/TableCustom.vue'
@@ -11,6 +11,7 @@ import AppFilterBar from '../../components/common/AppFilterBar.vue'
 import { debounce } from 'lodash-es'
 import AppDialog from '@/components/dialogs/AppDialog.vue'
 import AppForm from '@/components/forms/AppForm.vue'
+
 const notify = useNotification()
 
 const authors = ref([])
@@ -158,9 +159,19 @@ async function handleSubmit() {
     dialogVisible.value = false
     await fetchAuthor()
   } catch (e) {
-    notify.error(e?.response?.data?.message || e.message || 'Failed to save author')
+    notify.error(e?.response?.data?.error || e.message || 'Failed to save author')
   } finally {
     submitting.value = false
+  }
+}
+
+async function togggle(row) {
+  try {
+    await togglestatusauthor(row.id);
+     notify.success('កែប្រែជោគជ័យ')
+    fetchAuthor();
+  } catch (e) {
+     notify.error(e?.response?.data?.error || e.message || 'Failed to save author')
   }
 }
 
@@ -198,7 +209,7 @@ onMounted(() => {
       :action-span="4"
     >
       <template #name>
-        <AppInput v-model="filters.name" placeholder="Search by name" />
+        <AppInput v-model="filters.name" placeholder="ស្វែងរក..." clearable />
       </template>
 
       <template #gender>
@@ -236,8 +247,8 @@ onMounted(() => {
       @page-change="fetchAuthor"
     >
       <template #isActive="{ row }">
-        <el-tag :type="row.is_active ? 'success' : 'info'">
-          {{ row.is_active ? 'Active' : 'Inactive' }}
+        <el-tag :type="row.is_active ? 'success' : 'danger'">
+          {{ row.is_active ? 'សកម្ម' : 'អសកម្ម' }}
         </el-tag>
       </template>
 
@@ -252,7 +263,7 @@ onMounted(() => {
           v-for="f in row.faculty"
           :key="f.id"
           class="faculty-tag"
-          type="warning"
+          type="info"
           effect="plain"
         >
           {{ f.name }}
@@ -261,7 +272,12 @@ onMounted(() => {
       </template>
 
       <template #actions="{row}">
-        <AppButton icon="Edit" circle size="small" type="warning" @click="openEdit(row)" />
+       <el-tooltip content="កែប្រែ" placement="top">
+         <AppButton icon="Edit" circle size="small" type="warning" @click="openEdit(row)" />
+       </el-tooltip>
+        <el-tooltip content="បិទ/បេីក" placement="top">
+         <AppButton :icon="row.is_active ? 'CircleClose' : 'CircleCheck'" circle size="small" type="danger" @click="togggle(row)" />
+       </el-tooltip>
       </template>
     </TableCustom>
 
@@ -277,8 +293,9 @@ onMounted(() => {
         submitText="រក្សាទុក"
         resetText="ចាកចេញ"
       >
-        <AppInput v-model="form.name" placeholder="បញ្ចូលឈ្មោះ" clearable prop="name" />
+        <AppInput v-model="form.name" placeholder="បញ្ចូលឈ្មោះ" clearable prop="name" label="ឈ្មោះ" />
         <AppSelect
+          label="ភេទ"
           v-model="form.gender"
           :options="genderOptions"
           placeholder="ជ្រេីសរេីសភេទ"
@@ -286,6 +303,7 @@ onMounted(() => {
           prop="gender"
         />
         <AppSelect
+         label="មហាវិទ្យាល័យ"
           v-model="form.faculty_ids"
           :options="facultyOptions"
           placeholder="ជ្រេីសរេីសមហាវិទ្យាល័យ"
@@ -293,7 +311,7 @@ onMounted(() => {
           prop="faculty_ids"
           multiple
         ></AppSelect>
-        <AppInput v-model="form.note" placeholder="ចំណាំ" clearable prop="note"></AppInput>
+        <AppInput v-model="form.note" placeholder="ចំណាំ" clearable prop="note"  label="ចំណាំ"></AppInput>
       </AppForm>
     </AppDialog>
   </div>
