@@ -100,4 +100,25 @@ var Permissions = []model.Permission{
 		DisplayName: "Delete Author",
 		OrderNo:     4,
 	},
+
+	{
+		Name:        "faculty.view",
+		ModuleName:  "fdp",
+		DisplayName: "View Faculty",
+		OrderNo:     1,
+	},
+
+	{
+		Name:        "department.view",
+		ModuleName:  "fdp",
+		DisplayName: "View Department",
+		OrderNo:     2,
+	},
+
+	{
+		Name:        "program.view",
+		ModuleName:  "fdp",
+		DisplayName: "View Program",
+		OrderNo:     3,
+	},
 }

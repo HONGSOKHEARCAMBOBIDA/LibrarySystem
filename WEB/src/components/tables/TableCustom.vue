@@ -1,3 +1,83 @@
+<script setup>
+import { ref, computed, onMounted, onUnmounted, watch } from "vue";
+import { BREAKPOINTS } from "../../config/constants";
+import { useBreakpoint } from "../../composables/useBreakpoint";
+const props = defineProps({
+  data: { type: Array, default: () => [] },
+  columns: { type: Array, required: true },
+  loading: { type: Boolean, default: false },
+  showIndex: { type: Boolean, default: false },
+  indexLabel: { type: String, default: "ល.រ" },
+  actionsLabel: { type: String, default: "សកម្មភាព" },
+  actionsWidth: { type: [String, Number], default: 190 },
+  mobileBreakpoint: { type: Number, default: BREAKPOINTS.mobile },
+  showPagination: { type: Boolean, default: true },
+  currentPage: { type: Number, default: 1 },
+  pageSize: { type: Number, default: 10 },
+  total: { type: Number, default: 0 },
+  tableProps: { type: Object, default: () => ({}) },
+  selectable: { type: Boolean, default: false },
+});
+
+const emit = defineEmits([
+  "update:currentPage",
+  "update:pageSize",
+  "page-change",
+  "selection-change",
+]);
+
+const currentPageProxy = computed({
+  get: () => props.currentPage,
+  set: (val) => emit("update:currentPage", val),
+});
+
+const pageSizeProxy = computed({
+  get: () => props.pageSize,
+  set: (val) => emit("update:pageSize", val),
+});
+
+const windowWidth = ref(window.innerWidth);
+
+function onResize() {
+  windowWidth.value = window.innerWidth;
+}
+
+onMounted(() => {
+  window.addEventListener("resize", onResize);
+});
+
+onUnmounted(() => window.removeEventListener("resize", onResize));
+
+const {isMobile} = useBreakpoint()
+
+const selectedRows = ref([]);
+function onSelectionChange(rows) {
+  selectedRows.value = rows;
+  emit("selection-change", rows);
+}
+
+function isSelected(row) {
+  return selectedRows.value.includes(row);
+}
+
+function toggleMobileSelection(row, checked) {
+  if (checked) {
+    selectedRows.value.push(row);
+  } else {
+    selectedRows.value = selectedRows.value.filter((r) => r !== row);
+  }
+  emit("selection-change", selectedRows.value);
+}
+
+watch(
+  () => props.data,
+  () => {
+    selectedRows.value = [];
+    emit("selection-change", []);
+  },
+);
+</script>
+
 <template>
   <div
     class="app-table"
@@ -84,79 +164,6 @@
     </div>
   </div>
 </template>
-
-<script setup>
-import { ref, computed, onMounted, onUnmounted, watch } from "vue";
-// import { useCompanyStore } from '../stores/company'
-
-const props = defineProps({
-  data: { type: Array, default: () => [] },
-  columns: { type: Array, required: true },
-  loading: { type: Boolean, default: false },
-  showIndex: { type: Boolean, default: false },
-  indexLabel: { type: String, default: "ល.រ" },
-  actionsLabel: { type: String, default: "សកម្មភាព" },
-  actionsWidth: { type: [String, Number], default: 190 },
-  mobileBreakpoint: { type: Number, default: 768 },
-  showPagination: { type: Boolean, default: true },
-  currentPage: { type: Number, default: 1 },
-  pageSize: { type: Number, default: 10 },
-  total: { type: Number, default: 0 },
-  tableProps: { type: Object, default: () => ({}) },
-  selectable: { type: Boolean, default: false },
-});
-
-const emit = defineEmits([
-  "update:currentPage",
-  "update:pageSize",
-  "page-change",
-  "selection-change",
-]);
-
-const currentPageProxy = computed({
-  get: () => props.currentPage,
-  set: (val) => emit("update:currentPage", val),
-});
-const pageSizeProxy = computed({
-  get: () => props.pageSize,
-  set: (val) => emit("update:pageSize", val),
-});
-
-const windowWidth = ref(window.innerWidth);
-function onResize() {
-  windowWidth.value = window.innerWidth;
-}
-onMounted(() => {
-  window.addEventListener("resize", onResize);
-});
-onUnmounted(() => window.removeEventListener("resize", onResize));
-
-const isMobile = computed(() => windowWidth.value <= props.mobileBreakpoint);
-const selectedRows = ref([]);
-function onSelectionChange(rows) {
-  // fired by el-table on desktop
-  selectedRows.value = rows;
-  emit("selection-change", rows);
-}
-function isSelected(row) {
-  return selectedRows.value.includes(row);
-}
-function toggleMobileSelection(row, checked) {
-  if (checked) {
-    selectedRows.value.push(row);
-  } else {
-    selectedRows.value = selectedRows.value.filter((r) => r !== row);
-  }
-  emit("selection-change", selectedRows.value);
-}
-watch(
-  () => props.data,
-  () => {
-    selectedRows.value = [];
-    emit("selection-change", []);
-  },
-);
-</script>
 
 <style scoped>
 .app-table-cards {

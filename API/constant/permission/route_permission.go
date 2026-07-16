@@ -17,4 +17,8 @@ const (
 	AuthorCreate = "author.create"
 	AuthorUpdate = "author.update"
 	AuthorDelete = "author.delete"
+
+	FacultyView    = "faculty.view"
+	DepartmentView = "department.view"
+	ProgramView    = "program.view"
 )

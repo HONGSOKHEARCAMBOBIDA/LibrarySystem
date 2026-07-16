@@ -13,6 +13,7 @@ func SetupRoutes(r *gin.Engine) {
 	authcontroller := controller.NewAuthController()
 	rolecontroller := controller.NewRoleHasPermissionController()
 	authorcontroller := controller.NewAuthorController()
+	facultycontroller := controller.NewFacultyController()
 	public := r.Group("/api/v1")
 	public.Use(middleware.APIKeyAuth())
 	{
@@ -38,5 +39,8 @@ func SetupRoutes(r *gin.Engine) {
 		// Author
 		auth.POST(route.AuthorCreate, middleware.PermissionMiddleware(permission.AuthorCreate), authorcontroller.CreateAuthor)
 		auth.GET(route.AuthorView, middleware.PermissionMiddleware(permission.AuthorView), authorcontroller.GetAuthor)
+
+		// Faculty
+		auth.GET(route.FacultyView, middleware.PermissionMiddleware(permission.FacultyView), facultycontroller.GetFaculty)
 	}
 }

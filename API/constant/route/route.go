@@ -26,4 +26,9 @@ const (
 	AuthorCreate = "author.create"
 	AuthorUpdate = "author.update/:id"
 	AuthorDelete = "author.delete/:id"
+
+	// Faculty-Department-Program
+	FacultyView    = "faculty.view"
+	DepartmentView = "department.view"
+	ProgramView    = "program.view"
 )
