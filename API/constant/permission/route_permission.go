@@ -21,4 +21,6 @@ const (
 	FacultyView    = "faculty.view"
 	DepartmentView = "department.view"
 	ProgramView    = "program.view"
+
+	CategoryModify = "category.modify"
 )

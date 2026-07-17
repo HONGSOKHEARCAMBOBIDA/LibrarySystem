@@ -14,6 +14,9 @@ func SetupRoutes(r *gin.Engine) {
 	rolecontroller := controller.NewRoleHasPermissionController()
 	authorcontroller := controller.NewAuthorController()
 	facultycontroller := controller.NewFacultyController()
+	departmentcontroller := controller.NewDepartmentController()
+	programcontroller := controller.NewProgramController()
+	categorycontroller := controller.NewCategoryController()
 	public := r.Group("/api/v1")
 	public.Use(middleware.APIKeyAuth())
 	{
@@ -44,5 +47,13 @@ func SetupRoutes(r *gin.Engine) {
 
 		// Faculty
 		auth.GET(route.FacultyView, middleware.PermissionMiddleware(permission.FacultyView), facultycontroller.GetFaculty)
+		auth.GET(route.DepartmentView, middleware.PermissionMiddleware(permission.DepartmentView), departmentcontroller.GetDepartment)
+		auth.GET(route.ProgramView, middleware.PermissionMiddleware(permission.ProgramView), programcontroller.GetProgram)
+
+		// Category
+		auth.GET(route.CategoryView, middleware.PermissionMiddleware(permission.CategoryModify), categorycontroller.GetCategory)
+		auth.POST(route.CategoryCreate, middleware.PermissionMiddleware(permission.CategoryModify), categorycontroller.CreateCategory)
+		auth.PUT(route.CategoryUpdate, middleware.PermissionMiddleware(permission.CategoryModify), categorycontroller.UpdateCategory)
+		auth.PUT(route.CategoryToggleStatus, middleware.PermissionMiddleware(permission.CategoryModify), categorycontroller.ToggleStatusCategory)
 	}
 }

@@ -23,7 +23,8 @@ export const menuConfig = [
       { title: 'General', icon: 'Tools', path: '/settings' },
       {title: 'អ្នកប្រេីប្រាស់', icon: 'User',path: '/users'},
       {title: 'សិទ្ធ',icon: 'UserFilled',path: '/role'},
-      {title: 'អ្នកនិពន្ធ', icon: 'UserFilled',path: '/author'}
+      {title: 'អ្នកនិពន្ធ', icon: 'UserFilled',path: '/author'},
+      {title: 'ប្រភេទសៀវភៅ', icon: 'Document',path: '/category'}
     ],
   },
 ]

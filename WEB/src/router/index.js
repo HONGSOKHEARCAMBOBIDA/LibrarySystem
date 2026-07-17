@@ -61,6 +61,12 @@ const routes = [
         name: 'អ្នកនិពន្ធ',
         component: () => import('@/views/author/author.vue'),
         meta: {title: 'អ្នកនិពន្ធ', icone: 'UserFilled'}
+      },
+      {
+        path: 'category',
+        name: 'ប្រភេទសៀវភៅ',
+        component: () => import('@/views/category/category.vue'),
+        meta: {title: 'category', icone: 'Document'}
       }
     ],
   },

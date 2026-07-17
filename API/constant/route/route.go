@@ -30,6 +30,12 @@ const (
 
 	// Faculty-Department-Program
 	FacultyView    = "faculty.view"
-	DepartmentView = "department.view"
-	ProgramView    = "program.view"
+	DepartmentView = "department.view/:id"
+	ProgramView    = "program.view/:id"
+
+	// Category
+	CategoryView         = "category.view"
+	CategoryCreate       = "category.create"
+	CategoryUpdate       = "category.update/:id"
+	CategoryToggleStatus = "category.toggle.status/:id"
 )

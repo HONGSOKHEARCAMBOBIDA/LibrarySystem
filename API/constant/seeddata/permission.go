@@ -121,4 +121,11 @@ var Permissions = []model.Permission{
 		DisplayName: "View Program",
 		OrderNo:     3,
 	},
+
+	{
+		Name:        "category.modify",
+		ModuleName:  "category",
+		DisplayName: "Modify Category",
+		OrderNo:     1,
+	},
 }

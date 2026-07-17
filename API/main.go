@@ -16,6 +16,8 @@ func main() {
 	// Initialize database connection
 	config.LoadEnv()
 	config.ConnectDatabase()
+	//seed.SeedCabinet(config.DB)
+	// seed.SeedCategory(config.DB)
 	// seed.SeedPrograms(config.DB)
 	//seed.SeedDepartments(config.DB)
 	//seed.SeedFacultiess(config.DB)
