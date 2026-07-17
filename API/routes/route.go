@@ -17,6 +17,8 @@ func SetupRoutes(r *gin.Engine) {
 	departmentcontroller := controller.NewDepartmentController()
 	programcontroller := controller.NewProgramController()
 	categorycontroller := controller.NewCategoryController()
+	cabinetcontroller := controller.NewCabinetController()
+	filingcabinetcontroller := controller.NewFilingCabinetController()
 	public := r.Group("/api/v1")
 	public.Use(middleware.APIKeyAuth())
 	{
@@ -55,5 +57,11 @@ func SetupRoutes(r *gin.Engine) {
 		auth.POST(route.CategoryCreate, middleware.PermissionMiddleware(permission.CategoryModify), categorycontroller.CreateCategory)
 		auth.PUT(route.CategoryUpdate, middleware.PermissionMiddleware(permission.CategoryModify), categorycontroller.UpdateCategory)
 		auth.PUT(route.CategoryToggleStatus, middleware.PermissionMiddleware(permission.CategoryModify), categorycontroller.ToggleStatusCategory)
+
+		// Cabinet
+		auth.GET(route.CabinetView, middleware.PermissionMiddleware(permission.CabinetModify), cabinetcontroller.GetCabinet)
+
+		// FilingCabinet
+		auth.GET(route.FilingCabinetView, middleware.PermissionMiddleware(permission.FilingCabinetModify), filingcabinetcontroller.GetFilingCabinet)
 	}
 }

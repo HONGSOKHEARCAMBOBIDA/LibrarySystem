@@ -9,7 +9,6 @@ import (
 	"mysql/request"
 	"mysql/utils"
 	"strings"
-	"time"
 
 	"gorm.io/gorm"
 )
@@ -20,8 +19,6 @@ type CategoryService interface {
 	UpdateCategory(ctx context.Context, id int, input request.CategoryRequestUpdate) error
 	ToggleStatusCategory(ctx context.Context, id int) error
 }
-
-const defaultQueryTimeout = 5 * time.Second
 
 type categoryservice struct {
 	db *gorm.DB
@@ -34,7 +31,7 @@ func NewCategoryService() CategoryService {
 }
 
 func (s *categoryservice) GetCategory(ctx context.Context) ([]model.Category, error) {
-	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	ctx, cancel := context.WithTimeout(ctx, utils.DefaultQueryTimeout)
 	defer cancel()
 
 	var category []model.Category
@@ -51,7 +48,7 @@ func (s *categoryservice) CreateCategory(ctx context.Context, input request.Cate
 		return apperror.Invalid("category name is required", nil)
 	}
 
-	ctx, cancel := context.WithTimeout(ctx, defaultQueryTimeout)
+	ctx, cancel := context.WithTimeout(ctx, utils.DefaultQueryTimeout)
 	defer cancel()
 
 	newcategory := model.Category{
@@ -97,7 +94,7 @@ func (s *categoryservice) UpdateCategory(ctx context.Context, id int, input requ
 		return apperror.Invalid("no fields to update", nil)
 	}
 
-	ctx, cancel := context.WithTimeout(ctx, defaultQueryTimeout)
+	ctx, cancel := context.WithTimeout(ctx, utils.DefaultQueryTimeout)
 	defer cancel()
 
 	var rowsAffected int64

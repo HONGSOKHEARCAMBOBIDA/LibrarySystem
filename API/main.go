@@ -16,13 +16,14 @@ func main() {
 	// Initialize database connection
 	config.LoadEnv()
 	config.ConnectDatabase()
+	//seed.SeedFilingCabinet(config.DB)
 	//seed.SeedCabinet(config.DB)
 	// seed.SeedCategory(config.DB)
 	// seed.SeedPrograms(config.DB)
 	//seed.SeedDepartments(config.DB)
 	//seed.SeedFacultiess(config.DB)
 	// config.DB.AutoMigrate(&model.User{}, &model.Role{}, &model.Permission{})
-	//seed.SeedPermissions(config.DB)
+	//	seed.SeedPermissions(config.DB)
 	// seed.SeedRoles(config.DB)
 	// seed.SeedUser(config.DB)
 	// go func() {

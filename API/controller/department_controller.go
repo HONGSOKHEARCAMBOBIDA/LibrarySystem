@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"mysql/constant/apperror"
 	"mysql/constant/share"
 	"mysql/service"
 	"mysql/utils"
@@ -27,9 +26,7 @@ func (cr *DepartmentController) GetDepartment(c *gin.Context) {
 	}
 	data, err := cr.service.GetDepartment(c, facultyid)
 	if err != nil {
-		status := apperror.HTTPStatus(err)
-		msg := apperror.ClientMessage(err)
-		share.ResponseError(c, status, msg)
+		share.RespondServiceError(c, err)
 		return
 	}
 	share.RespondDate(c, http.StatusOK, data)

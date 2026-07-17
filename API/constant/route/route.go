@@ -38,4 +38,10 @@ const (
 	CategoryCreate       = "category.create"
 	CategoryUpdate       = "category.update/:id"
 	CategoryToggleStatus = "category.toggle.status/:id"
+
+	// Cabinet
+	CabinetView = "cabinet.view"
+
+	// Filing Cabinet
+	FilingCabinetView = "filing.cabinet.view"
 )

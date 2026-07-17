@@ -128,4 +128,18 @@ var Permissions = []model.Permission{
 		DisplayName: "Modify Category",
 		OrderNo:     1,
 	},
+
+	{
+		Name:        "cabinet.modify",
+		ModuleName:  "cabinet",
+		DisplayName: "Modify Cabinet",
+		OrderNo:     1,
+	},
+
+	{
+		Name:        "filing.cabinet.modify",
+		ModuleName:  "filingcabinet",
+		DisplayName: "Modify Filing Cabinet",
+		OrderNo:     1,
+	},
 }

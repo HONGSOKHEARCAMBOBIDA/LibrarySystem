@@ -23,4 +23,8 @@ const (
 	ProgramView    = "program.view"
 
 	CategoryModify = "category.modify"
+
+	CabinetModify = "cabinet.modify"
+
+	FilingCabinetModify = "filing.cabinet.modify"
 )
