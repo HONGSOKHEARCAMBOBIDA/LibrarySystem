@@ -31,7 +31,7 @@ export default defineConfig({
     open: true,
     proxy: {
       '/api': {
-        target: 'http://localhost:8080',
+        target: 'https://1w35nszf-8080.asse.devtunnels.ms',
         changeOrigin: true,
       },
     },

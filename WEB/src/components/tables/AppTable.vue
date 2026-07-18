@@ -23,7 +23,7 @@ defineEmits(['sort-change', 'selection-change', 'row-click'])
     <el-table
       border
       v-if="!isMobile"
-      v-loading="loading"
+   
       :data="data"
       :row-key="rowKey"
       :stripe="stripe"

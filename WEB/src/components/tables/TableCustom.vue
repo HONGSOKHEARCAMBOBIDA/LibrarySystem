@@ -86,7 +86,7 @@ watch(
       v-if="!isMobile"
       ref="tableRef"
       :data="data"
-      v-loading="loading"
+   
       stripe
       border
       v-bind="tableProps"
